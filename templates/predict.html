@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Disease</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 2rem;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        header a {
+            text-decoration: none;
+            color: #f8c300;
+            font-weight: 600;
+        }
+        .error {
+            background: #ff4b2b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .result {
+            text-align: center;
+        }
+        .result-card {
+            display: inline-block;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+            transition: transform 0.3s;
+        }
+        .result-card:hover { transform: translateY(-5px); }
+        .positive { background: linear-gradient(135deg, #56ab2f, #a8e063); color: #141e30; }
+        .negative { background: linear-gradient(135deg, #cb2d3e, #ef473a); color: #fff; }
+
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #141e30;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+        .btn:hover { transform: translateY(-3px); }
+
+        .prediction-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+            margin-top: 1rem;
+        }
+        .form-group { display: grid; gap: 1rem; }
+        .input-group label { font-weight: 600; margin-bottom: 0.3rem; }
+        input, select {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        input:focus, select:focus { border-color: #f8c300; outline: none; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ result.disease if result else disease.capitalize() }} Prediction</h1>
+            <a href="/">← Home</a>
+        </header>
+
+        {% if error %}
+            <div class="error">
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+        {% if result %}
+            <div class="result">
+                <div class="result-card {{ 'positive' if result.prediction == 'Positive' else 'negative' }}">
+                    <h3>{{ result.prediction }}</h3>
+                    <p>Confidence: {{ result.confidence }}%</p>
+                </div>
+                <a href="/predict?disease={{ result.disease.lower() }}" class="btn">New Prediction</a>
+            </div>
+        {% else %}
+            <form method="POST" class="prediction-form">
+                <input type="hidden" name="disease" value="{{ disease }}">
+                <div class="form-group">
+                    {% for feature in features %}
+                        <div class="input-group">
+                            <label>{{ feature[1] }}</label>
+                            {% if feature[2] == 'select' %}
+                                <select name="{{ feature[0] }}" required>
+                                    {% for option in feature[3] %}
+                                        <option value="{{ option[0] }}">{{ option[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <input type="{{ feature[2] }}" name="{{ feature[0] }}" placeholder="Enter {{ feature[1] }}" required>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn">Predict Disease</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
