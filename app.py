@@ -1,5 +1,5 @@
 # app.py - Main Flask Application
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 import joblib
 import numpy as np
 import os
@@ -101,4 +101,5 @@ def predict():
 if __name__ == '__main__':
     if not os.path.exists(app.config['MODEL_FOLDER']):
         os.makedirs(app.config['MODEL_FOLDER'])
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
